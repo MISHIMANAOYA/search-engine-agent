@@ -26,4 +26,4 @@ RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app
 USER appuser
 
 # Command to run the application
-CMD gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 120 app:app
+CMD gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 120 --preload --access-logfile - --error-logfile - app:app

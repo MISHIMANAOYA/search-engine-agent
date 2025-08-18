@@ -146,7 +146,20 @@ def search_web(query):
 
 @app.route('/')
 def home():
-    return "Welcome to the YouTube Search API! Use the /search endpoint with a query parameter."
+    return jsonify({
+        "status": "ok",
+        "message": "検索エンジンエージェント API - 稼働中",
+        "endpoints": {
+            "search": "/search",
+            "bedrock_status": "/bedrock-status",
+            "health": "/health"
+        }
+    })
+
+@app.route('/health')
+def health():
+    """ヘルスチェック用エンドポイント"""
+    return jsonify({"status": "healthy", "timestamp": "2025-08-18"}), 200
 
 @app.route('/bedrock-status', methods=['GET'])
 def bedrock_status():
