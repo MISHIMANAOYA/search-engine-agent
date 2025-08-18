@@ -1,16 +1,29 @@
+# Use Python 3.11 slim image
 FROM python:3.11-slim
 
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Set work directory
 WORKDIR /app
 
-# 依存関係をコピーしてインストール
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
 COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# アプリケーションファイルをコピー
+# Copy project
 COPY . .
 
-# ポートを公開
-EXPOSE $PORT
+# Create a non-root user
+RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app
+USER appuser
 
-# gunicornでアプリを起動
-CMD gunicorn --bind 0.0.0.0:$PORT app:app
+# Command to run the application
+CMD gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 120 app:app
