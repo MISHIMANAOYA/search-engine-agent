@@ -1,10 +1,16 @@
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
+# 依存関係をコピーしてインストール
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
+# アプリケーションファイルをコピー
 COPY . .
 
-CMD ["python", "app.py"]
+# ポートを公開
+EXPOSE $PORT
+
+# gunicornでアプリを起動
+CMD gunicorn --bind 0.0.0.0:$PORT app:app
