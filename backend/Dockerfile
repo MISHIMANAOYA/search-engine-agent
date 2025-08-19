@@ -1,29 +1,10 @@
-# Use Python 3.11 slim image
-FROM python:3.11-slim
+FROM python:3.9-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# Set work directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy project
 COPY . .
 
-# Create a non-root user
-RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app
-USER appuser
-
-# Command to run the application
-CMD gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 120 --preload --access-logfile - --error-logfile - app:app
+CMD ["python", "app.py"]
